@@ -1,0 +1,302 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+.topic-listing > li {
+  margin: 0;
+}
+
+.topic-listing-filter {
+  font-size: 0.6rem;
+  margin: 0 0 0.4rem 0.4rem;
+}
+
+.topic {
+  display: grid;
+  grid-template-areas:
+    "title    voting"
+    "metadata voting"
+    "info     info";
+  grid-template-columns: 1fr auto;
+  grid-gap: 0.2rem;
+
+  // set some minimum row heights on mobile to space them out a bit
+  $row-height: $min-touch-size - 4px;  // subtract grid-gap
+  grid-template-rows: repeat(3, minmax($row-height, auto));
+
+  // on larger screens, rows can size automatically
+  @media (min-width: $size-md) {
+    grid-template-rows: auto;
+  }
+
+  align-items: center;
+
+  position: relative;
+
+  padding: 0.2rem;
+
+  @media (min-width: $size-sm) {
+    padding: 0.4rem;
+  }
+
+  font-size: 0.6rem;
+
+  header {
+    grid-area: title;
+    display: flex;
+    min-height: 1rem;
+  }
+
+  .topic-metadata {
+    grid-area: metadata;
+  }
+
+  .topic-title {
+    display: inline;
+    margin: 0;
+    margin-right: 0.2rem;
+    font-size: 0.8rem;
+  }
+
+  .topic-categories {
+    grid-area: category;
+  }
+
+  .topic-info {
+    grid-area: info;
+  }
+
+  .topic-text-excerpt {
+    grid-area: content;
+  }
+
+  .topic-voting {
+    grid-area: voting;
+  }
+}
+
+.topic-categories {
+  display: flex;
+  align-items: center;
+}
+
+.topic-content-metadata {
+  white-space: nowrap;
+}
+
+.topic-group {
+  margin-right: 0.4rem;
+}
+
+.topic-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  margin-right: 0.2rem;
+  border: 1px dashed;
+  background-size: 16px 16px;
+}
+
+.topic-log {
+  dt {
+    display: inline;
+  }
+}
+
+.topic-log-listing {
+  list-style-type: none;
+  margin-left: 0;
+  font-size: 0.6rem;
+}
+
+.topic-log-entry {
+  margin-bottom: 0.8rem;
+}
+
+.topic-metadata {
+  display: flex;
+  align-items: baseline;
+  max-height: 4rem;
+  overflow: hidden;
+}
+
+.topic-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.topic-voting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0.2rem;
+  margin-bottom: auto;
+  padding: 0.2rem;
+  height: auto;
+  font-weight: normal;
+
+  // make the voting button wider on large screens
+  @media (min-width: $size-sm) {
+    min-width: 3rem;
+  }
+
+  &.btn-used {
+    border-color: transparent;
+
+    .topic-voting-votes {
+      font-weight: bold;
+    }
+  }
+}
+
+.topic-voting-votes {
+  font-size: 0.8rem;
+  line-height: 1rem;
+}
+
+.topic-voting-label {
+  font-size: 0.6rem;
+  line-height: 0.6rem;
+}
+
+.topic-text-excerpt {
+  @extend %text-container;
+
+  display: none;
+
+  @media (min-width: $size-md) {
+    display: block;
+  }
+
+  max-width: none;
+  margin: 0;
+  overflow: hidden;
+  font-style: italic;
+
+  h1 {
+    margin: 0 0 0.4rem;
+  }
+
+  summary {
+    line-height: 0.8rem;
+  }
+
+  summary::after {
+    font-style: italic;
+    content: "Re-collapse topic text";
+    display: none;
+  }
+
+  &[open] {
+    font-style: normal;
+    font-size: 0.8rem;
+
+    summary {
+      font-size: 0.6rem;
+
+      &::after {
+        display: inline;
+      }
+
+      span {
+        display: none;
+      }
+    }
+  }
+}
+
+.topic-info {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 0.7fr;
+
+  @media (min-width: $size-sm) {
+    grid-template-columns: 1fr 1.2fr 1fr;
+  }
+
+  grid-column-gap: 0.4rem;
+
+  max-width: 32rem;
+  white-space: nowrap;
+}
+
+.topic-info-comments {
+  white-space: normal;
+}
+
+.topic-info-comments-new {
+  white-space: nowrap;
+}
+
+.topic-info-source {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topic-full {
+  .topic-voting {
+    float: right;
+  }
+}
+
+.topic-full-byline {
+  margin-bottom: 0.4rem;
+  font-size: 0.6rem;
+}
+
+.topic-full-link {
+  display: flex;
+  word-break: break-all;
+}
+
+.topic-full-content {
+  margin-top: 1rem;
+}
+
+.topic-full-text {
+  @extend %text-container;
+
+  overflow: auto;
+}
+
+.topic-comments-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  margin-bottom: 0.4rem;
+
+  h2 {
+    margin-right: 0.4rem;
+    white-space: nowrap;
+  }
+
+  .btn-group {
+    margin-right: auto;
+  }
+
+  .form-listing-options {
+    margin-left: 0;
+  }
+}
+
+.topic-with-excerpt {
+  // on larger screens only, add the "content" grid area
+  @media (min-width: $size-md) {
+    grid-template-areas:
+      "title    voting"
+      "metadata voting"
+      "content  voting"
+      "info     info";
+  }
+}
+
+.is-topic-mine {
+  border-left: 3px solid;
+  margin-left: -3px;
+}
+
+.is-topic-official {
+  border-left: 3px solid;
+  margin-left: -3px;
+}

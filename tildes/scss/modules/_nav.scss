@@ -1,0 +1,45 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+.nav {
+  li {
+    margin-bottom: 0;
+    font-size: 0.6rem;
+    font-weight: bold;
+  }
+
+  .nav {
+    margin-left: 0;
+
+    li {
+      margin-top: 0.2rem;
+      font-size: 0.8rem;
+      font-weight: normal;
+      border-bottom: 0;
+
+      &.active a {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .nav-item a {
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .nav-item .btn-link {
+    height: auto;
+    font-size: 0.8rem;
+    font-weight: normal;
+    padding: 0.2rem 0.4rem;
+    border: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% extends 'topic_listing.jinja2' %}
+
+{% from 'macros/forms.jinja2' import search_form %}
+
+{% block title %}Search results for "{{ search }}"{% endblock %}
+
+{% block header_context_link %}<span class="site-header-context">Search: "{{ search }}"</span>{% endblock %}
+
+{% block sidebar %}
+  {{ search_form(search) }}
+
+  <h2>Search results</h2>
+
+  <p><a href="/">Back to home page</a></p>
+
+  {% if request.user and request.user.subscriptions %}
+    <div class="divider"></div>
+    <ul class="nav">
+      <li>Subscriptions</li>
+      <ul class="nav">
+      {% for subscription in request.user.subscriptions|sort(attribute='group') %}
+        <li class="nav-item"><a href="/~{{ subscription.group.path }}">~{{ subscription.group.path }}</a></li>
+      {% endfor %}
+      </ul>
+    </ul>
+  {% endif %}
+
+{% endblock %}

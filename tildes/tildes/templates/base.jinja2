@@ -1,0 +1,152 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% from 'macros/user.jinja2' import logged_in_user_info with context %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="intercoolerjs:use-data-prefix" content="true">
+  <meta name="csrftoken" content="{{ get_csrf_token() }}">
+
+  <meta property="og:image" content="{{ request.static_url("/images/tildes-logo-144x144.png") }}">
+  <meta property="og:site_name" content="Bawajee">
+  <meta property="og:type" content="website">
+  {% block meta_og_tags %}
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="Bawajee: a non-profit community site">
+  {% endblock %}
+
+  {# Hardcoding each option isn't great, but I don't know a better method #}
+  {% if request.cookies.get('theme', '') == 'dark' %}
+  <meta name="theme-color" content="#073642">
+  {% elif request.cookies.get("theme", "") == "dracula" %}
+  <meta name="theme-color" content="#282a36">
+  {% elif request.cookies.get("theme", "") == "atom-one-dark" %}
+  <meta name="theme-color" content="#282c34">
+  {% elif request.cookies.get('theme', '') == 'black' %}
+  <meta name="theme-color" content="#222">
+  {% endif %}
+
+  {% assets "css" %}
+  <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {% endassets %}
+  <link rel="stylesheet" href="/css/site-icons.css">
+
+  {# Favicons and other data for "pinning" the site on various platforms #}
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#002b36">
+  <meta name="apple-mobile-web-app-title" content="Tildes">
+  <meta name="application-name" content="Tildes">
+  <meta name="msapplication-TileColor" content="#002b36">
+
+  <title>{% block title_full %}{% block title %}{% endblock %} - Bawajee{% endblock %}</title>
+
+  {% block templates %}{% endblock %}
+</head>
+
+{% block body_tag %}
+  {% if request.cookies.get('theme', '') %}
+  <body class="theme-{{ request.cookies.get('theme', '') }}">
+  {% elif request.user and request.user.theme_default %}
+  <body class="theme-{{ request.user.theme_default }}">
+  {% else %}
+  <body>
+  {% endif %}
+{% endblock %}
+
+<header id="site-header" data-js-hide-sidebar-if-open>
+  <a class="site-header-logo" href="/">Bawajee</a>
+  {% block header_context_link %}{% endblock %}
+
+  {{ logged_in_user_info() }}
+
+  <button
+    class="btn btn-sm btn-link site-header-sidebar-button
+    {% if request.user and request.user.num_unread_total > 0 %}
+      badge
+    {% endif %}
+    "
+    data-js-sidebar-toggle
+    {% if request.user and request.user.num_unread_total > 0 %}
+      data-badge="{{ request.user.num_unread_total }}"
+    {% endif %}
+  >Sidebar</button>
+
+</header>
+
+<main class="{% block main_classes %}{% endblock %}" data-js-hide-sidebar-if-open>
+
+{# Only output the <h1> tag if the main_heading block has some content #}
+{% set main_heading %}{% block main_heading %}{% endblock %}{% endset %}
+{% if main_heading %}
+  <h1 class="heading-main">{{ main_heading }}</h1>
+{% endif %}
+
+{% block content %}{% endblock %}
+</main>
+
+<aside id="sidebar">
+  <div class="sidebar-controls">
+    {{ logged_in_user_info() }}
+
+    <button class="btn btn-sm btn-link" data-js-sidebar-toggle>Close sidebar</button>
+  </div>
+  {% block sidebar %}
+  {% endblock %}
+</aside>
+
+<footer id="site-footer" data-js-hide-sidebar-if-open>
+  {# Show the theme-selection dropdown if the user isn't logged in #}
+  {% if not request.user %}
+    <div class="site-footer-theme-selection">
+      <label for="theme">Theme:</label>
+      <select class="form-select" name="theme" id="theme" data-js-theme-selector>
+        {% for (theme, description) in (
+            ("white", "White"),
+            ("light", "Solarized Light"),
+            ("dark", "Solarized Dark"),
+            ("dracula", "Dracula"),
+            ("atom-one-dark", "Atom One Dark"),
+            ("black", "Black")) %}
+        <option value="{{ theme }}"
+          {{ 'selected' if theme == request.cookies.get("theme", "white") else '' }}
+        >
+          {{ description }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endif %}
+
+  <p><div class="copyright" align="center">
+  <script>
+    document.write('&copy; ' );
+    document.write(new Date().getFullYear());
+    document.write(' Bawajee, Inc. All rights reserved');
+  </script>
+</div></p>
+<p>Powered by <b>Tildes</b>
+</p>
+  <ul class="site-footer-links">
+    <li class="site-footer-link"><a href="https://bawajee.com/contact">Contact</a></li>
+    <li class="site-footer-link"><a href="https://bawajee.com/privacy-policy">Privacy policy</a></li>
+    <li class="site-footer-link"><a href="https://bawajee.com/terms-of-use">Terms of use</a></li>
+  </ul>
+</footer>
+
+{% assets "javascript-third-party" -%}
+  <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+
+{% assets "javascript" -%}
+  <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+
+</body>
+</html>

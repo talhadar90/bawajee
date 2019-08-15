@@ -1,0 +1,314 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+.comment {
+  border-left: 1px solid;
+  margin-bottom: 0.4rem;
+
+  &:target > .comment-itself {
+    border-left: 3px solid;
+  }
+}
+
+.comment[data-comment-depth="0"] {
+  border-bottom: 1px solid;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  font-size: 0.7rem;
+  line-height: 0.7rem;
+
+  // no padding on mobile - the collapse button will do the job
+  padding: 0 0.2rem 0 0;
+
+  @media (min-width: $size-md) {
+    padding: 0.2rem;
+  }
+}
+
+.comment-user-info {
+  margin-left: 0.2rem;
+}
+
+.comment-posted-time {
+  margin-left: 0.4rem;
+  font-size: 0.6rem;
+}
+
+.comment-edited-time {
+  font-size: 0.6rem;
+  font-style: italic;
+  margin-left: 0.4rem;
+}
+
+.comment-excerpt {
+  display: none;
+
+  margin-left: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.comment-branch-counter {
+  display: none;
+
+  margin-right: 0.4rem;
+}
+
+.comment-exemplary-reasons {
+  display: inline-block;
+  margin: 0.2rem 0.4rem;
+  font-size: 0.6rem;
+
+  &[open] {
+    border-bottom: 1px dashed;
+  }
+
+  ul {
+    list-style-type: circle;
+    margin-top: 0;
+    margin-left: 2rem;
+  }
+}
+
+.comment-nav-link {
+  @include min-touch-size;
+
+  display: flex;
+  align-items: center;
+
+  font-size: 0.6rem;
+
+  margin-left: 0.4rem;
+
+  @media (min-width: $size-md) {
+    margin-left: 1rem;
+  }
+}
+
+.comment-tree {
+  margin: 0;
+  padding-top: 0.4rem;
+  list-style-type: none;
+}
+
+.comment-tree-replies {
+  margin-left: 0.4rem;
+
+  @media (min-width: $size-xl) {
+    margin-left: 1rem;
+  }
+}
+
+.comment-tree-item {
+  margin: 0;
+  padding: 0;
+  max-width: none;
+}
+
+.comment-labels {
+  margin: 0 0 0 0.4rem;
+  list-style-type: none;
+
+  li {
+    margin-top: 0;
+    max-width: none;
+  }
+}
+
+.comment-label-buttons {
+  display: flex;
+  flex-wrap: wrap;
+
+  margin: 0;
+  padding: 0 1rem;
+  justify-content: space-between;
+
+  @media (min-width: $size-md) {
+    justify-content: left;
+  }
+}
+
+.comment-label-count {
+  font-size: 0.6rem;
+}
+
+.comment-text {
+  @extend %text-container;
+
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+  overflow: auto;
+}
+
+.comment-removed-warning {
+  font-weight: bold;
+  font-size: 0.6rem;
+}
+
+.comment-votes {
+  font-size: 0.6rem;
+  font-weight: bold;
+  margin: 0 0.4rem;
+}
+
+.is-comment-by-op {
+  > .comment-itself {
+    margin-left: -2px;
+    border-left: 3px solid;
+
+    .comment-user-info {
+      font-weight: bold;
+    }
+  }
+}
+
+%collapsed {
+  .comment-edited-time,
+  .comment-exemplary-reasons,
+  .comment-label-buttons,
+  .comment-labels,
+  .comment-nav-link,
+  .comment-posted-time,
+  .comment-tree-replies,
+  .comment-text,
+  .comment-votes,
+  .btn-post {
+    display: none;
+  }
+
+  .comment-excerpt {
+    display: inline-block;
+  }
+
+  &.is-comment-by-op .comment-user-info {
+    font-weight: normal;
+  }
+
+  header {
+    font-size: 0.6rem;
+    line-height: 0.8rem;
+  }
+}
+
+.is-comment-collapsed:not(:target) {
+  @extend %collapsed;
+
+  &[data-comment-depth="0"] {
+    border-bottom: 0;
+  }
+
+  .comment-branch-counter {
+    display: inline-block;
+    font-size: 0.7rem;
+  }
+}
+
+// uses @extend to only collapse everything inside the collapsed comment itself and
+// not its replies
+.is-comment-collapsed-individual:not(:target) {
+  > .comment-itself {
+    @extend %collapsed;
+  }
+}
+
+.is-comment-deleted,
+.is-comment-removed {
+  font-size: 0.7rem;
+  font-style: italic;
+}
+
+.is-comment-mine {
+  > .comment-itself {
+    margin-left: -2px;
+    border-left: 3px solid;
+  }
+}
+
+.is-comment-new {
+  > .comment-itself {
+    margin-left: -2px;
+    border-left: 3px solid;
+  }
+}
+
+.is-comment-exemplary {
+  > .comment-itself {
+    margin-left: -2px;
+    border-left: 3px solid;
+  }
+}
+
+@mixin flatten-single-replies-above-depth($depth) {
+  // Makes it so that comments of the specified depth or greater will not indent
+  // their replies when they only have one reply *and* they're also the only reply to
+  // their parent (this avoids confusion between subtrees and siblings).
+  // When indenting is avoided, it adds text at the top of the next comment (the single
+  // reply) indicating that it's a direct reply to the above comment.
+
+  // We actually need the selector to check 2 levels up from the specified starting
+  // depth because of how we're utilizing nesting.
+  @if ($depth < 2) {
+    @error "Starting depth must be at least 2";
+  }
+
+  $depth: $depth - 2;
+
+  .comment[data-comment-depth="#{$depth}"] {
+    .comment[data-comment-replies="1"] > .comment-tree-replies > .comment-tree-item {
+      > .comment[data-comment-replies="1"] {
+        > .comment-tree-replies {
+          margin-left: -1px;  // compensate for border
+
+          > .comment-tree-item > .comment > .comment-itself {
+            > .comment-text::before,
+            > header > .is-comment-deleted::before,
+            > header > .is-comment-removed::before {
+              content: "(Reply to above comment)";
+              font-size: 0.6rem;
+              font-style: italic;
+              margin-right: 0.2rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $size-xs) {
+  @include flatten-single-replies-above-depth(4);
+}
+
+@media (min-width: $size-xs) and (max-width: $size-sm) {
+  @include flatten-single-replies-above-depth(7);
+}
+
+@media (min-width: $size-sm) and (max-width: $size-md) {
+  @include flatten-single-replies-above-depth(10);
+}
+
+@media (min-width: $size-md) and (max-width: $size-lg) {
+  // drop back down because sidebar shows up, which actually gives less space
+  @include flatten-single-replies-above-depth(7);
+}
+
+@media (min-width: $size-lg) and (max-width: $size-xl) {
+  @include flatten-single-replies-above-depth(9);
+}
+
+@media (min-width: $size-xl) and (max-width: $size-2x) {
+  // don't increase much yet since left indent increases, so space is reduced again
+  @include flatten-single-replies-above-depth(12);
+}
+
+@media (min-width: $size-2x) and (max-width: $size-max) {
+  @include flatten-single-replies-above-depth(20);
+}
+
+@media (min-width: $size-max) {
+  @include flatten-single-replies-above-depth(30);
+}

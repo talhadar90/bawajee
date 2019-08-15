@@ -1,0 +1,26 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+.label {
+  font-size: 0.6rem;
+}
+
+.label-comment {
+  font-size: 0.5rem;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.label-topic-tag {
+  background-color: transparent;
+  margin: 0 0.4rem 0 0;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.label-topic-tag-spoiler,
+.label-topic-tag-nsfw,
+.label-topic-tag[class*="label-topic-tag-nsfw-"],
+.label-topic-tag[class*="label-topic-tag-spoiler-"] {
+  font-weight: bold;
+}

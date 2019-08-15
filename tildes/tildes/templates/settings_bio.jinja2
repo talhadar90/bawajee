@@ -1,0 +1,30 @@
+{# Copyright (c) 2019 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% extends 'base_settings.jinja2' %}
+
+{% from 'macros/forms.jinja2' import markdown_textarea %}
+
+{% block title %}Edit your user bio{% endblock %}
+
+{% block main_heading %}Edit your user bio{% endblock %}
+
+{% block settings %}
+  <p>Enter a bio that others will be able to view on your user page (maximum {{ bio_max_length }} characters). To remove your bio, set it to blank.</p>
+
+  <div class="divider"></div>
+
+  <form
+    method="post"
+    name="user-bio"
+    autocomplete="off"
+    data-ic-patch-to="{{ request.route_url("ic_user", username=request.user.username) }}"
+    data-js-confirm-leave-page-unsaved
+  >
+    {{ markdown_textarea(text=request.user.bio_markdown) }}
+
+    <div class="form-buttons">
+      <button type="submit" class="btn btn-primary">Save bio</button>
+    </div>
+  </form>
+{% endblock %}

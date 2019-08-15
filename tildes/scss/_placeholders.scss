@@ -1,0 +1,46 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+// styles specifically for elements containing text content (often from markdown)
+%text-container {
+  a {
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  hr {
+    margin-left: 0;
+    max-width: $paragraph-max-width;
+  }
+
+  ol,
+  ul {
+    $list-left-margin: 2rem;
+    margin: 0 0 0.4rem $list-left-margin;
+
+    li {
+      margin-top: 0.2rem;
+      max-width: $paragraph-max-width - $list-left-margin;
+    }
+
+    ol,
+    ul {
+      margin-left: 1rem;
+    }
+
+    &:last-child {
+      margin-bottom: 0.2rem;
+    }
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+}

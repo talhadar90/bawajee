@@ -1,0 +1,76 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% macro markdown_textarea(id='markdown', text=None, auto_focus=False) %}
+  <div class="form-markdown">
+    <header>
+      <menu class="tab tab-markdown-mode">
+        <li class="tab-item active" data-js-tab data-js-markdown-edit-tab>
+          <button type="button" class="btn btn-link">Edit</button>
+        </li>
+        <li class="tab-item" data-js-tab data-js-markdown-preview-tab>
+          <button
+            type="button"
+            class="btn btn-link"
+            data-ic-post-to="/api/web/markdown_preview"
+            data-ic-target="#{{ id }}-preview"
+            data-ic-replace-target="false"
+          >Preview</button>
+        </li>
+      </menu>
+      <a href="https://bawajee.com/text-formatting" target="_blank" tabindex="-1">Formatting help</a>
+    </header>
+    <textarea
+      class="form-input"
+      id="{{ id }}"
+      name="markdown"
+      placeholder="Text (Markdown)"
+      data-js-ctrl-enter-submit-form
+      {% if auto_focus %}data-js-auto-focus{% endif %}
+    >{% if text %}{{ text }}{% endif %}</textarea>
+    <div id="{{ id }}-preview" class="form-markdown-preview d-none"></div>
+  </div>
+{% endmacro %}
+
+{% macro topic_tagging(value=None, auto_focus=False, autocomplete_options=None) %}
+  <div class="form-autocomplete form-group" data-js-autocomplete-container data-js-ctrl-enter-submit-form>
+    <label class="form-label" for="tags">
+      <span>Tags (optional, comma-separated)</span>
+      <a href="https://bawajee.com/topic-tagging" target="_blank" tabindex="-1">Tagging help</a>
+    </label>
+    <div class="form-autocomplete-input form-input">
+      <div class="chips" data-js-autocomplete-chips></div>
+      <input
+        class="form-input"
+        id="tags"
+        type="text"
+        autocorrect="off"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        name="tags"
+        placeholder='Tags (like "music, soundtrack, full album")'
+        data-js-autocomplete-input='{{ autocomplete_options|tojson if autocomplete_options }}'
+        {% if value %} value="{{ value }}"{% endif %}
+        {% if auto_focus %}data-js-auto-focus{% endif %}
+      >
+    </div>
+    <div class="autocomplete" data-js-autocomplete-suggestions></div>
+    <input name="tags-hidden" type="hidden" value="" data-js-autocomplete-hidden-input>
+  </div>
+{% endmacro %}
+
+{% macro search_form(existing_query=None) %}
+  <form class="form-search" method="GET" action="/search">
+    <div class="input-group">
+      <input
+        type="text"
+        class="form-input input-sm"
+        name="q"
+        id="q"
+        {% if existing_query %}value="{{ existing_query }}"{% endif %}
+      >
+      <button class="btn btn-sm btn-link">Search</button>
+    </div>
+  </form>
+{% endmacro %}

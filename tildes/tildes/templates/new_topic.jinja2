@@ -1,0 +1,16 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% extends 'base_no_sidebar.jinja2' %}
+
+{% block title %}New topic{% endblock %}
+
+{% block header_context_link %}
+<a class="site-header-context" href="/~{{ group.path }}">~{{ group.path }}</a>
+{% endblock %}
+
+{% block main_heading %}Post a new topic in ~{{ group.path }}{% endblock %}
+
+{% block content %}
+  {% include "includes/new_topic_form.jinja2" %}
+{% endblock %}

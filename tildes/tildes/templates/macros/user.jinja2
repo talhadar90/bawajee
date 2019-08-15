@@ -1,0 +1,40 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% from 'utils.jinja2' import pluralize %}
+
+{% macro logged_in_user_info() %}
+  <div class="logged-in-user-info">
+    {% if request.user %}
+      <a class="logged-in-user-username" href="/user/{{ request.user }}">{{ request.user }}</a>
+
+      {% if request.user.num_unread_messages > 0 %}
+        <a class="logged-in-user-alert" href="/messages/unread">
+          {{ pluralize(request.user.num_unread_messages, "new message") }}
+        </a>
+      {% endif %}
+
+      {% if request.user.num_unread_notifications > 0 %}
+        <a class="logged-in-user-alert" href="/notifications/unread">
+          {{ pluralize(request.user.num_unread_notifications, "new comment") }}
+        </a>
+      {% endif %}
+    {# Only show the "Log in" link if we're not already on the login page #}
+    {% elif not request.matched_route or request.matched_route.name != "login" %}
+      <a class="text-small link-no-visited-color"
+        {% if request.path_qs == "/" %}
+          href="/login"
+        {% else %}
+          href="/login?from_url={{ request.path_qs|quote_plus }}"
+        {% endif %}
+      >Log in </a>
+      <a class="text-small link-no-visited-color"
+        {% if request.path_qs == "/" %}
+          href="/register"
+        {% else %}
+          href="/login?from_url={{ request.path_qs|quote_plus }}"
+        {% endif %}
+      >Register&nbsp;</a>
+    {% endif %}
+  </div>
+{% endmacro %}

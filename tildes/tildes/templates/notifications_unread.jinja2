@@ -1,0 +1,84 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% extends 'base_user_menu.jinja2' %}
+
+{% from 'macros/comments.jinja2' import comment_label_options_template, comment_reply_template, render_single_comment with context %}
+{% from 'macros/links.jinja2' import group_linked, username_linked %}
+
+{% block title %}Unread notifications{% endblock %}
+
+{% block main_heading %}Unread notifications
+  {% if notifications and not request.user.auto_mark_notifications_read %}
+      <button
+        class="btn btn-link-minimal ml-2"
+        data-ic-put-to="{{ request.route_url(
+            'ic_comment_mark_read',
+            comment_id36=notifications[0].comment.comment_id36,
+            _query={"mark_all_previous": "true"},
+        )}}",
+        data-ic-target="closest main"
+      >Mark all read</button>
+  {% endif %}
+
+{% endblock %}
+
+{% block content %}
+{% if notifications %}
+  <ol class="post-listing post-listing-notifications">
+  {% for notification in notifications: %}
+    <li>
+      {% if notification.is_comment_reply %}
+        <h2 class="heading-notification">Reply to your comment on <a href="{{ notification.comment.topic.permalink }}">{{ notification.comment.topic.title }}</a> in {{ group_linked(notification.comment.topic.group.path) }}</h2>
+      {% elif notification.is_topic_reply %}
+        <h2 class="heading-notification">Reply to your topic <a href="{{ notification.comment.topic.permalink }}">{{ notification.comment.topic.title }}</a> in {{ group_linked(notification.comment.topic.group.path) }}</h2>
+      {% elif notification.is_mention %}
+        <h2 class="heading-notification">
+            You were mentioned in a comment on <a href="{{ notification.comment.topic.permalink }}">{{ notification.comment.topic.title }}</a> in {{ group_linked(notification.comment.topic.group.path) }}
+        </h2>
+      {% endif %}
+
+      {% if notification.is_unread and not request.user.auto_mark_notifications_read %}
+        <button
+          class="btn btn-link-minimal ml-2"
+          data-ic-put-to="{{ request.route_url(
+            'ic_comment_mark_read',
+            comment_id36=notification.comment.comment_id36,
+          ) }}"
+          data-js-fadeout-parent-on-success
+        >Mark as read</button>
+      {% endif %}
+      {{ render_single_comment(notification.comment) }}
+    </li>
+  {% endfor %}
+  </ol>
+
+  {% if notifications.has_prev_page or notifications.has_next_page %}
+    <div class="pagination">
+      {% if notifications.has_prev_page %}
+        <a class="page-item btn"
+          href="{{ request.current_listing_normal_url({'before': notifications.prev_page_before_id36}) }}"
+        >Prev</a>
+      {% endif %}
+
+      {% if notifications.has_next_page %}
+        <a class="page-item btn"
+          href="{{ request.current_listing_normal_url({'after': notifications.next_page_after_id36}) }}"
+        >Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if request.user.interact_mark_notifications_read %}
+    <p class="text-secondary text-small">Comments will be automatically marked read when you take an action on them (such as voting or replying). They will not disappear from the unread page until reloading. If you prefer to always mark them manually, you can disable this behavior on <a href="/settings">the Settings page</a>.</p>
+  {% endif %}
+{% else %}
+  <p>No unread notifications.</p>
+  <p><a href="/notifications">Go to previously read notifications</a></p>
+{% endif %}
+{% endblock %}
+
+{% block templates %}
+  {{ comment_label_options_template(comment_label_options) }}
+  {{ comment_reply_template() }}
+{% endblock %}

@@ -1,0 +1,23 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+.post-listing {
+  > li {
+    margin-bottom: 1rem;
+  }
+
+  .is-topic-mine,
+  .is-topic-official {
+    margin-left: -1px;
+  }
+}
+
+.post-listing-notifications {
+  .comment {
+    margin-bottom: 0.4rem;
+  }
+
+  .btn-link-minimal {
+    margin-left: 0.4rem;
+  }
+}

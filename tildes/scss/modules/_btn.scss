@@ -1,0 +1,121 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+.btn {
+  @include min-touch-size;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 0.6rem;
+  font-weight: bold;
+}
+
+.btn.btn-sm {
+  font-size: 0.6rem;
+}
+
+.btn-link-minimal {
+  display: inline;
+  height: auto;
+  width: auto;
+  padding: 0;
+  border: 0;
+  font-weight: normal;
+
+  @media (min-width: $size-md) {
+    min-height: 0;
+  }
+}
+
+.btn-comment-collapse {
+  height: 100%;
+  line-height: 100%;
+  padding: 0;
+
+  @media (max-width: $size-md) {
+    border-left: 0;
+  }
+
+  margin-right: 0.4rem;
+
+  @media (min-width: $size-md) {
+    margin-right: 0.2rem;
+    min-width: 0.8rem;
+  }
+}
+
+.btn-comment-label {
+  @include min-touch-size;
+
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0.4rem;
+  padding: 0.2rem;
+
+  font-size: 0.6rem;
+  font-weight: bold;
+  text-transform: capitalize;
+
+  cursor: pointer;
+
+  &.btn {
+    height: 1rem;
+    text-transform: capitalize;
+  }
+
+  &.btn-used {
+    border: 1px solid;
+  }
+}
+
+.btn-light {
+  font-weight: normal;
+}
+
+.btn-post {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0 0.2rem;
+
+  // The buttons don't need to be spaced widely on a desktop
+  @media (min-width: $size-md) {
+    justify-content: left;
+  }
+
+  li {
+    margin-top: 0;
+  }
+
+  // Combined with flex-wrap: wrap, this should put any form on its own line
+  form {
+    min-width: 100%;
+  }
+}
+
+.btn-post-action {
+  @include min-touch-size;
+
+  display: flex;
+  padding: 0.4rem;
+
+  background: none;
+  border: 0;
+
+  justify-content: center;
+  align-items: center;
+
+  font-weight: bold;
+  font-size: 0.6rem;
+  line-height: 0.6rem;
+
+  cursor: pointer;
+}
+
+.btn-post-action-used {
+  text-decoration: underline;
+}

@@ -1,0 +1,162 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% extends 'base_user_menu.jinja2' %}
+
+{% block title %}User settings{% endblock %}
+
+{% block main_heading %}User settings{% endblock %}
+
+{% block content %}
+  <ul class="settings-list">
+    <li>
+      <label for="theme">Choose a display theme:</label>
+
+      <form
+        class="form-inline"
+        name="account-default-theme"
+        data-ic-patch-to="{{ request.route_url(
+          'ic_user',
+          username=request.user.username
+        ) }}"
+      >
+        <select class="form-select col-8 col-sm-12" name="theme" id="theme" data-js-theme-selector>
+          {% for theme, description in theme_options.items() %}
+            <option
+              value="{{ theme }}"
+              {{ 'selected' if theme == current_theme else '' }}
+            >
+              {{ description }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <button id="button-set-default-theme" class="btn btn-link d-none">
+          Set as account default
+        </button>
+      </form>
+    </li>
+
+    <li>
+      <form
+        name="interact-mark-notifications-read"
+        autocomplete="off"
+        data-ic-patch-to="{{ request.route_url('ic_user', username=request.user.username) }}"
+      >
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input
+              type="checkbox"
+              id="interact_mark_notifications_read"
+              name="interact_mark_notifications_read"
+              data-js-autosubmit-on-change
+              {% if request.user.interact_mark_notifications_read %}checked{% endif %}
+            >
+            <i class="form-icon"></i> Automatically mark notifications read when you interact with the source comment (by voting, labeling, replying, etc.)
+          </label>
+        </div>
+      </form>
+    </li>
+
+    <li>
+      <form
+        name="auto-mark-notifications-read"
+        autocomplete="off"
+        data-ic-patch-to="{{ request.route_url('ic_user', username=request.user.username) }}"
+      >
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input
+              type="checkbox"
+              id="auto_mark_notifications_read"
+              name="auto_mark_notifications_read"
+              data-js-autosubmit-on-change
+              {% if request.user.auto_mark_notifications_read %}checked{% endif %}
+            >
+            <i class="form-icon"></i> Automatically mark all notifications read when you view the Unread Notifications page
+          </label>
+        </div>
+      </form>
+    </li>
+
+    <li>
+      <h4>Open links in new tabs</h4>
+      <form
+        name="open-links-new-tab"
+        autocomplete="off"
+        data-ic-patch-to="{{ request.route_url('ic_user', username=request.user.username) }}"
+      >
+        <ul class="settings-list">
+          <li>
+            <div class="form-group">
+              <label class="form-checkbox">
+                <input
+                  type="checkbox"
+                  id="open_new_tab_external"
+                  name="open_new_tab_external"
+                  data-js-autosubmit-on-change
+                  {% if request.user.open_new_tab_external %}checked{% endif %}
+                >
+                <i class="form-icon"></i> Topic links to other websites
+              </label>
+            </div>
+          </li>
+          <li>
+            <div class="form-group">
+              <label class="form-checkbox">
+                <input
+                  type="checkbox"
+                  id="open_new_tab_internal"
+                  name="open_new_tab_internal"
+                  data-js-autosubmit-on-change
+                  {% if request.user.open_new_tab_internal %}checked{% endif %}
+                >
+                <i class="form-icon"></i> Links to text topics and comments
+              </label>
+            </div>
+          </li>
+          <li>
+            <div class="form-group">
+              <label class="form-checkbox">
+                <input
+                  type="checkbox"
+                  id="open_new_tab_text"
+                  name="open_new_tab_text"
+                  data-js-autosubmit-on-change
+                  {% if request.user.open_new_tab_text %}checked{% endif %}
+                >
+                <i class="form-icon"></i> External links in topic, comment, and message text
+              </label>
+            </div>
+          </li>
+        </ul>
+      </form>
+    </li>
+    <li><a href="/settings/password_change">Change your password</a></li>
+    <li>
+      <a href="/settings/account_recovery">Set up account recovery</a>
+      <div class="text-small text-secondary">To be able to regain access in case of lost password, compromise, etc.</div>
+    </li>
+    <li>
+      {% if not request.user.two_factor_enabled %}
+        <a href="/settings/two_factor">Enable two-factor authentication</a>
+        <div class="text-small text-secondary">For extra security, you can enable two-factor authentication.</div>
+      {% else %}
+        <a href="/settings/two_factor">Disable two-factor authentication</a>
+        <div class="text-small text-secondary">Disabling two-factor authentication requires a code from your device or a backup code.</div>
+      {% endif %}
+    </li>
+    <li>
+      <a href="/settings/comment_visits">Configure marking new comments (currently {{ 'enabled' if request.user.track_comment_visits else 'disabled' }})</a>
+      <div class="text-small text-secondary">Marks new comments in topics since your last visit, and which topics have any</div>
+    </li>
+    <li>
+      <a href="/settings/filters">Define topic tag filters</a>
+      <div class="text-small text-secondary">Define a list of topic tags to filter out of listings by default</div>
+    </li>
+    <li>
+      <a href="/settings/bio">Edit your user bio</a>
+      <div class="text-small text-secondary">Tell others about yourself with a short bio on your user page</div>
+    </li>
+  </ul>
+{% endblock %}

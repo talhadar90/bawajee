@@ -1,0 +1,193 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% from 'macros/datetime.jinja2' import adaptive_date_responsive %}
+{% from 'macros/links.jinja2' import group_linked, username_linked %}
+{% from 'utils.jinja2' import pluralize %}
+
+{% macro render_topic_for_listing(topic, show_group=False, rank=None) %}
+  <article id="topic-{{ topic.topic_id36 }}"
+    class="{{ topic_classes(topic)|trim }}"
+    data-topic-posted-by="{{ topic.user.username }}"
+  >
+    <header>
+      {% if topic.is_link_type %}
+        <div class="topic-icon topic-icon-{{ topic.link_domain.replace('.', '_') }}"></div>
+      {% endif %}
+
+      <div>
+        <h1 class="topic-title">
+          {% if topic.is_text_type %}
+            <a
+              href="{{ topic.permalink }}"
+              {% if request.user.open_new_tab_internal %}target="_blank"{% endif %}
+            >{{ topic.title }}</a>
+          {% elif topic.is_link_type %}
+            <a
+              href="{{ topic.link }}"
+              {% if request.user.open_new_tab_external %}
+                target="_blank"
+                rel="noopener"
+              {% endif %}
+            >{{ topic.title }}</a>
+          {% endif %}
+        </h1>
+        {% if topic.content_metadata_for_display %}
+          <span class="topic-content-metadata">({{ topic.content_metadata_for_display }})</span>
+        {% endif %}
+      </div>
+    </header>
+
+    <div class="topic-metadata">
+      {% if show_group %}
+        <span class="topic-group">{{ group_linked(topic.group.path) }}</span>
+      {% endif %}
+
+      {% if topic.tags %}
+        <ul class="topic-tags">
+          {% for tag in topic.tags %}
+            {% if request.matched_route.name in ('home', 'group') %}
+              {{ topic_tag(tag, request.current_listing_normal_url({'tag': tag.replace(' ', '_')})) }}
+            {% else %}
+              {{ topic_tag(tag, request.route_url('home', _query=[('tag', tag.replace(' ', '_'))])) }}
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    {% if topic.content_excerpt %}
+      {{ topic_excerpt_expandable(topic) }}
+    {% endif %}
+
+    <footer class="topic-info">
+      <div class="topic-info-comments">
+        <a
+          href="{{ topic.permalink }}"
+          {% if request.user.open_new_tab_internal %}target="_blank"{% endif %}
+        >
+          {{ pluralize(topic.num_comments, "comment") }}
+
+          {% if topic.comments_since_last_visit is defined and topic.comments_since_last_visit %}
+            <span class="topic-info-comments-new" title="Last visit {{ topic.last_visit_time|ago }}">
+              ({{ topic.comments_since_last_visit }} new)
+            </span>
+          {% endif %}
+        </a>
+      </div>
+
+      <div class="topic-info-source"
+      {% if topic.is_user_treated_as_source %}
+        aria-label="Posted by">{{ username_linked(topic.user.username) }}
+      {% else %}
+        aria-label="Link source">{{ topic.link_source }}
+      {% endif %}
+      </div>
+
+      <div aria-label="Post time">{{ adaptive_date_responsive(topic.created_time, precision=1) }}</div>
+    </footer>
+
+    {{ topic_voting(topic) }}
+
+  </article>
+{% endmacro %}
+
+{% macro topic_excerpt_expandable(topic) %}
+  {% if topic.is_spoiler %}
+    {% set excerpt = 'Warning: this post may contain spoilers' %}
+    {% set is_expandable = True %}
+
+    {% if topic.is_text_type %}
+      {% set full_text = topic.rendered_html|safe %}
+    {% else %}
+      {% set full_text = topic.content_excerpt %}
+    {% endif %}
+  {% else %}
+    {% set excerpt = topic.content_excerpt %}
+    {% set is_expandable = topic.is_content_excerpt_truncated %}
+    {% set full_text = topic.rendered_html|safe %}
+  {% endif %}
+
+  {% if is_expandable %}
+    <details class="topic-text-excerpt"
+      {% if request.user and request.user.open_new_tab_text %}
+      data-js-external-links-new-tabs
+      {% endif %}
+    >
+      <summary><span>{{ excerpt }}</span></summary>
+      {{ full_text }}
+    </details>
+  {% else %}
+    <p class="topic-text-excerpt">{{ excerpt }}</p>
+  {% endif %}
+{% endmacro %}
+
+{% macro topic_voting(topic) %}
+  {% if request.has_permission('vote', topic) %}
+    {% if topic.user_voted %}
+      <button class="btn topic-voting btn-used"
+        data-ic-delete-from="{{ request.route_url(
+          'ic_topic_vote',
+          topic_id36=topic.topic_id36,
+        ) }}"
+        data-ic-replace-target="true"
+      >
+    {% else %}
+      <button class="btn topic-voting"
+        data-ic-put-to="{{ request.route_url(
+          'ic_topic_vote',
+          topic_id36=topic.topic_id36,
+        ) }}"
+        data-ic-replace-target="true"
+      >
+    {% endif %}
+  {% else %}
+    <div class="topic-voting">
+  {% endif %}
+
+  {# Hide voting from the topic's author if it has zero votes #}
+  {% if request.user != topic.user or topic.num_votes > 0 %}
+    <span class="topic-voting-votes">{{ topic.num_votes }}</span>
+    <span class="topic-voting-label">
+    {% trans num_votes=topic.num_votes %}
+    vote
+    {% pluralize %}
+    votes
+    {% endtrans %}
+    </span>
+  {% endif %}
+
+  {% if request.has_permission('vote', topic) %}
+    </button>
+  {% else %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro topic_classes(topic) %}
+  {% set classes = ['topic'] %}
+
+  {% if request.user == topic.user %}
+    {% do classes.append('is-topic-mine') %}
+  {% endif %}
+
+  {% if topic.is_official %}
+    {% do classes.append('is-topic-official') %}
+  {% endif %}
+
+  {% if topic.content_excerpt %}
+    {% do classes.append("topic-with-excerpt") %}
+  {% endif %}
+
+  {{ classes|join(' ') }}
+{% endmacro %}
+
+{% macro topic_tag(tag, link=None) %}
+  <li class="label label-topic-tag label-topic-tag-{{ tag.replace(' ', '_').replace('.', '-') }}">
+    {% if link %}
+      <a href="{{ link }}">{{ tag }}</a>
+    {% else %}
+      {{ tag }}
+    {% endif %}
+  </li>
+{% endmacro %}

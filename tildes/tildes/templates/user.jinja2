@@ -1,0 +1,182 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% extends 'base_user_menu.jinja2' %}
+
+{% from 'macros/comments.jinja2' import comment_label_options_template, comment_reply_template, render_single_comment with context %}
+{% from 'macros/links.jinja2' import group_linked, username_linked %}
+{% from 'macros/topics.jinja2' import render_topic_for_listing with context %}
+
+{% block title %}User: {{ user.username }}{% endblock %}
+
+{% block templates %}
+  {% if request.user %}
+    {{ comment_reply_template() }}
+    {{ comment_label_options_template(comment_label_options) }}
+  {% endif %}
+{% endblock %}
+
+{% block header_context_link %}
+<a class="site-header-context" href="/user/{{ user.username }}">{{ user.username }}</a>
+{% endblock %}
+
+{# Only show the heading if they can't see the type tabs and the user isn't deleted/banned #}
+{% block main_heading %}
+  {% if not (user.is_deleted or user.is_banned) and not request.has_permission("view_history", user) %}
+    {{ user.username }}'s recent activity
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if user.is_deleted or user.is_banned %}
+  <div class="empty">
+    {% if user.is_banned %}
+      <h2 class="empty-title">This user is banned</h2>
+    {% elif user.is_deleted %}
+      <h2 class="empty-title">This user has deleted their account</h2>
+    {% endif %}
+
+    <div class="empty-action"><a href="/" class="btn btn-primary">Back to the home page</a></div>
+  </div>
+{% else %}
+  {% if request.has_permission("view_history", user) %}
+    <div class="listing-options">
+      <menu class="tab tab-listing-order">
+        <li class="tab-item{{' active' if not post_type else ''}}">
+          <a href="{{ request.current_listing_normal_url() }}">All posts</a>
+        </li>
+        <li class="tab-item{{' active' if post_type == 'topic' else ''}}">
+          <a href="{{ request.current_listing_normal_url({'type': 'topic'}) }}">Topics</a>
+        </li>
+        <li class="tab-item{{ ' active' if post_type == 'comment' else ''}}">
+          <a href="{{ request.current_listing_normal_url({'type': 'comment'}) }}">Comments</a>
+        </li>
+      </menu>
+
+      {% if order_options %}
+        <form class="form-listing-options" method="get">
+          <input type="hidden" name="type" value="{{ post_type }}">
+          <div class="form-group">
+            <label for="order">sorted by</label>
+            <select id="order" name="order" class="form-select" data-js-autosubmit-on-change>
+              {% for option in order_options %}
+                <option value="{{ option.name.lower() }}"
+
+                {% if option == order %}
+                  selected
+                {% endif %}
+                >{{ option.descending_description }}</option>
+              {% endfor %}
+            </select>
+            {# add a submit button for people with js disabled so this is still usable #}
+            <noscript>
+              <button type="submit" class="btn btn-primary btn-sm">OK</button>
+            </noscript>
+          </div>
+        </form>
+      {% endif %}
+
+    </div>
+  {% endif %}
+
+  {% if posts %}
+    {% if request.has_permission("view_history", user) and posts.has_prev_page %}
+      <div class="pagination">
+        {% if posts.has_prev_page %}
+          <a class="page-item btn"
+            href="{{ request.current_listing_base_url({'before': posts.prev_page_before_id36}) }}"
+          >Prev</a>
+        {% endif %}
+
+        {% if posts.has_next_page %}
+          <a class="page-item btn"
+            href="{{ request.current_listing_base_url({'after': posts.next_page_after_id36}) }}"
+          >Next</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <ol class="post-listing">
+    {% for post in posts if request.has_permission('view', post) %}
+      <li>
+      {% if post is topic %}
+        {{ render_topic_for_listing(post, show_group=True) }}
+      {% elif post is comment %}
+        <h2 class="heading-post-listing">Comment on <a href="{{ post.topic.permalink }}">
+          {% if post.topic.is_deleted and not post.topic.title %}
+            &lt;deleted topic&gt;
+          {% else %}
+            {{ post.topic.title }}
+          {% endif %}
+        </a> in {{ group_linked(post.topic.group.path) }}</h2>
+        {{ render_single_comment(post) }}
+      {% endif %}
+      </li>
+    {% endfor %}
+    </ol>
+
+    {% if request.has_permission("view_history", user) and (posts.has_prev_page or posts.has_next_page) %}
+      <div class="pagination">
+        {% if posts.has_prev_page %}
+          <a class="page-item btn"
+            href="{{ request.current_listing_base_url({'before': posts.prev_page_before_id36}) }}"
+          >Prev</a>
+        {% endif %}
+
+        {% if posts.has_next_page %}
+          <a class="page-item btn"
+            href="{{ request.current_listing_base_url({'after': posts.next_page_after_id36}) }}"
+          >Next</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="empty">
+      <h2 class="empty-title">This user hasn't made any posts</h2>
+    </div>
+  {% endif %}
+{% endif %}
+
+{% endblock %}
+
+{% block sidebar %}
+{% if user == request.user %}
+  {{ super() }}
+<hr>
+{% endif %}
+
+{% if request.has_permission("view_info", user) %}
+<h2>User info</h2>
+<dl>
+  <dt>Registered</dt>
+  <dd>{{ user.created_time.strftime('%B %-d, %Y') }}</dd>
+
+  {% if user.bio_rendered_html %}
+    <div class="user-bio">
+      <dt>Bio</dt>
+      <dd>{{ user.bio_rendered_html|safe }}</dd>
+    </div>
+  {% endif %}
+</dl>
+{% endif %}
+
+{% if request.has_permission('message', user) %}
+  <a href="/user/{{ user.username }}/new_message" class="btn btn-primary">Send a private message</a>
+{% endif %}
+
+{% if request.has_permission("ban", user) %}
+  <div class="divider"></div>
+  {% if user.is_banned %}
+    <button class="btn"
+      data-ic-delete-from="{{ request.route_url("ic_user_ban", username=user.username) }}"
+      data-ic-confirm="Unban user {{ user.username }}?"
+    >Unban user</button>
+  {% else %}
+    <button class="btn"
+      data-ic-put-to="{{ request.route_url("ic_user_ban", username=user.username) }}"
+      data-ic-confirm="Ban user {{ user.username }}?"
+    >Ban user</button>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

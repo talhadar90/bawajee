@@ -1,0 +1,74 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+#site-header {
+  .logged-in-user-alert {
+    margin-right: 1rem;
+  }
+
+  .logged-in-user-info {
+    // hidden on small screens
+    display: none;
+
+    @media (min-width: $show-sidebar-width) {
+      display: flex;
+    }
+
+    margin-left: auto;
+  }
+}
+
+.site-header-context {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-header-logo {
+  background-image: url("/favicon-32x32.png");
+  background-repeat: no-repeat;
+
+  // keep the logo pixelated - "pixelated" is best but Firefox only supports
+  // "crisp-edges" as of Firefox 68
+  image-rendering: pixelated;
+
+  @supports not (image-rendering: pixelated) {
+    image-rendering: crisp-edges;
+  }
+
+  padding-left: 40px;
+  padding-right: 8px;
+  line-height: 32px;
+
+  font-size: 1.2rem;
+  font-weight: bold;
+
+  &:hover,
+  &:active,
+  &:focus {
+    text-decoration: none;
+  }
+
+  @media (min-width: $size-xs) {
+    margin-right: 1rem;
+  }
+}
+
+.site-header-sidebar-button {
+  @media (min-width: $show-sidebar-width) {
+    display: none;
+  }
+
+  margin-left: auto;
+
+  &.badge {
+    margin-right: 0.6rem;
+
+    &[data-badge]::after {
+      box-shadow: none;
+      font-size: 0.5rem;
+      height: 0.7rem;
+      transform: translate(50%, -40%);
+    }
+  }
+}

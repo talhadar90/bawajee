@@ -1,0 +1,62 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% extends 'base.jinja2' %}
+
+{% block title %}Register a new account{% endblock %}
+
+{% block main_heading %}Register a new account{% endblock %}
+
+{% block content %}
+
+  <p>Please check the sidebar for information about username and password restrictions.</p>
+
+  <form class="form-narrow" method="post" data-ic-post-to="/register">
+    <input type="hidden" name="csrf_token" value="{{ get_csrf_token() }}">
+
+    <div class="form-group">
+      <label class="form-label" for="username">Username</label>
+      <input class="form-input" id="username" name="username" type="text" placeholder="Username">
+    </div>
+    <p class="form-input-note">Please don't abuse your early access to Bawajee to register a "famous" username unless you have a reasonable claim to it.</p>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input class="form-input" id="password" name="password" type="password" placeholder="Password">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password_confirm">Confirm password</label>
+      <input class="form-input" id="password_confirm" name="password_confirm" type="password" placeholder="Confirm password">
+    </div>
+
+    <div class="form-group">
+      <label class="form-checkbox">
+        <input type="checkbox" id="accepted_terms" name="accepted_terms">
+        <i class="form-icon"></i> I accept the <a href="https://bawajee.com/terms-of-use" target="_blank">Terms of Use</a> and <a href="https://bawajee.com/privacy-policy" target="_blank">Privacy Policy</a>
+        <p class="text-small">They're short and written in plain language&mdash;please actually read them!</p>
+      </label>
+    </div>
+
+    <div class="form-buttons">
+      <button class="btn btn-primary" type="submit">Register</button>
+    </div>
+  </form>
+{% endblock %}
+
+{% block sidebar %}
+<h2>Restrictions</h2>
+<dl>
+  <dt>Username restrictions</dt>
+  <dd>
+    <ul>
+      <li>3 - 20 characters long.</li>
+      <li>Valid characters are ASCII letters, numbers, underscore and dash.</li>
+      <li>No religious usernames</li>
+      <li>Must start and end with a number or letter.</li>
+      <li>No consecutive underscores and/or dashes.</li>
+    </ul>
+  </dd>
+  {% include 'includes/password_restrictions.jinja2' %}
+</dl>
+{% endblock %}

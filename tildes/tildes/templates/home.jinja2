@@ -1,0 +1,87 @@
+{# Copyright (c) 2018 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% extends 'topic_listing.jinja2' %}
+
+{% from 'macros/forms.jinja2' import search_form %}
+
+{% block title_full %}Bawajee{% endblock %}
+
+{% block meta_og_tags %}
+  <meta property="og:title" content="Bawajee">
+  <meta property="og:description" content="Bawajee is a non-profit site that respects its users privacy and prioritizes quality content.">
+{% endblock %}
+
+{% block header_context_link %}{% endblock %}
+
+{% block content %}
+  {% if request.user %}
+    {% if request.user.subscriptions %}
+      {{ super() }}
+    {% else %}
+      <div class="empty">
+        <h2 class="empty-title">You aren't subscribed to any groups yet</h2>
+        <p class="empty-subtitle">This page will show a combined listing of topics from groups that you're subscribed to.</p>
+        <div class="empty-action"><a href="/groups" class="btn btn-primary">Browse the list of groups</a></div>
+      </div>
+    {% endif %}
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+  {{ search_form() }}
+
+  <h2>Home</h2>
+
+  {% if request.user %}
+    <p>The home page shows topics from groups that you're subscribed to.</p>
+  {% else %}
+    <p>The home page shows topics from all the groups on Bawajee.</p>
+    <p>Logged-in users can choose which groups they subscribe to and/or filter out posts with particular tags.</p>
+  {% endif %}
+
+  {% if groups %}
+    <ul class="nav">
+      {% if request.user %}
+        <li>Subscriptions</li>
+      {% else %}
+        <li>Groups</li>
+      {% endif %}
+
+      <ul class="nav">
+      {% for group in groups|sort %}
+        <li class="nav-item"><a href="/~{{ group.path }}">~{{ group.path }}</a></li>
+      {% endfor %}
+      </ul>
+    </ul>
+    <a href="/groups" class="btn btn-primary">Browse the list of groups</a>
+  {% endif %}
+
+  {% if request.user %}
+    <div class="divider"></div>
+
+    <ul class="nav">
+    <li>User settings</li>
+
+    <ul class="nav">
+      {% if not (tag or unfiltered) %}
+      <li><details>
+        <summary>Filtered topic tags ({{ request.user.filtered_topic_tags|length }})</summary>
+        <ul class="topic-tags">
+          {% for tag in request.user.filtered_topic_tags %}
+            <li class="label label-topic-tag">{{ tag }}</li>
+          {% else %}
+            <li class="label label-topic-tag">No filtered tags</li>
+          {% endfor %}
+        </ul>
+        <a class="btn btn-link" href="/settings/filters">Edit filtered tags</a>
+      </details></li>
+      {% endif %}
+
+      <li class="nav-item ml-2"><a href="/settings">Settings page</a></li>
+    </ul>
+    </ul>
+  {% endif %}
+{% endblock %}

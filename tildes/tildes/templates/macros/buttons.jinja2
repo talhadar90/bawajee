@@ -1,0 +1,50 @@
+{# Copyright (c) 2019 Tildes contributors <code@tildes.net> #}
+{# SPDX-License-Identifier: AGPL-3.0-or-later #}
+
+{% macro post_action_toggle_button(name, subject, is_toggled) %}
+  {% if subject is comment %}
+    {% set type_name = "comment" %}
+  {% elif subject is topic %}
+    {% set type_name = "topic" %}
+  {% endif %}
+  {% set route_name = "ic_" + type_name + "_" + name %}
+
+  {% if name == "bookmark" %}
+    {% set normal_label = "Bookmark" %}
+    {% set toggled_label = "Unbookmark" %}
+  {% elif name == "lock" %}
+    {% set normal_label = "Lock" %}
+    {% set toggled_label = "Unlock" %}
+    {% set normal_confirm = "Lock this topic?" %}
+    {% set toggled_confirm = "Unlock this topic?" %}
+  {% elif name == "remove" %}
+    {% set normal_label = "Remove" %}
+    {% set toggled_label = "Un-remove" %}
+    {% set normal_confirm = "Remove this " + type_name + "?" %}
+    {% set toggled_confirm = "Un-remove this " + type_name + "?" %}
+  {% endif %}
+
+  <li>
+  {% if not is_toggled %}
+    <button class="btn-post-action"
+      data-ic-put-to="{{ _post_action_toggle_button_url(route_name, subject) }}"
+      data-ic-replace-target="true"
+      {% if normal_confirm %}data-ic-confirm="{{ normal_confirm }}"{% endif %}
+    >{{ normal_label }}</button>
+  {% else %}
+    <button class="btn-post-action btn-post-action-used"
+      data-ic-delete-from="{{ _post_action_toggle_button_url(route_name, subject) }}"
+      data-ic-replace-target="true"
+      {% if toggled_confirm %}data-ic-confirm="{{ toggled_confirm }}"{% endif %}
+    >{{ toggled_label }}</button>
+  {% endif %}
+  </li>
+{% endmacro %}
+
+{% macro _post_action_toggle_button_url(route_name, subject) %}
+  {% if subject is comment -%}
+    {{ request.route_url(route_name, comment_id36=subject.comment_id36) }}
+  {% elif subject is topic -%}
+    {{ request.route_url(route_name, topic_id36=subject.topic_id36) }}
+  {%- endif %}
+{% endmacro %}

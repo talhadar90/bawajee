@@ -1,0 +1,65 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+#sidebar {
+  p {
+    margin-bottom: 0.4rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .logged-in-user-info {
+    flex-direction: column;
+  }
+
+  .sidebar-controls .btn {
+    width: auto;
+  }
+
+  .form-search {
+    margin-bottom: 1rem;
+
+    .btn {
+      width: auto;
+      padding: 0 0.4rem;
+      font-weight: normal;
+    }
+  }
+
+  .nav .btn-link {
+    width: auto;
+  }
+}
+
+.sidebar-controls {
+  display: flex;
+
+  @media (min-width: $show-sidebar-width) {
+    display: none;
+  }
+
+  margin: -0.4rem;
+  margin-bottom: 0.4rem;
+  padding: 0.2rem 0.4rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.is-sidebar-displayed {
+  @media (max-width: $show-sidebar-width) {
+    display: block !important;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    min-width: 0 !important;
+    max-width: 90vw;
+    z-index: 1000;
+    min-height: 100vh;
+    height: 100%;
+
+    border-left: 3px double;
+  }
+}

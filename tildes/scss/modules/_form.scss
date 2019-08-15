@@ -1,0 +1,106 @@
+// Copyright (c) 2018 Tildes contributors <code@tildes.net>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+.form-narrow {
+  max-width: 20rem;
+}
+
+select.form-select:not([multiple]) {
+  // would be better to implement autoprefixer to do this
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-listing-options {
+  margin-left: 1rem;
+
+  label,
+  select {
+    font-size: 0.6rem;
+  }
+
+  select {
+    width: auto;
+    height: 1.4rem;
+    padding: 0 0 0 0.2rem;
+  }
+}
+
+.form-login {
+  margin-bottom: 2rem;
+}
+
+.form-markdown {
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    a {
+      font-size: 0.6rem;
+    }
+  }
+}
+
+.form-markdown-preview {
+  @extend %text-container;
+
+  min-height: 8rem;
+  padding: 0.4rem;
+  border: 1px dashed;
+  overflow: auto;
+}
+
+.form-buttons {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+
+  margin: 0.2rem 0;
+  max-width: 40rem;
+
+  button {
+    margin-left: 0.4rem;
+    flex-shrink: 0;
+  }
+}
+
+textarea.form-input {
+  height: 8rem;
+  line-height: 1.5;
+  max-width: none;
+  transition: none;
+}
+
+.form-status {
+  margin: auto 0;
+  font-size: 0.6rem;
+}
+
+.form-input {
+  max-width: 40rem;
+}
+
+.form-input-note {
+  font-size: 0.6rem;
+  line-height: 0.9rem;
+  margin: 0.2rem;
+}
+
+.form-label {
+  display: flex;
+  justify-content: space-between;
+  max-width: 40rem;
+
+  a {
+    font-size: 0.6rem;
+  }
+}
+
+.form-search .form-input {
+  margin-right: 0.4rem;
+}
+
+#new-topic {
+  margin-bottom: 200px;
+}
