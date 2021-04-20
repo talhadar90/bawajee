@@ -52,7 +52,7 @@ prospector==1.1.6.2
 psycopg2==2.8.3
 ptyprocess==0.6.0
 publicsuffix2==2.20160818
-py==1.8.0
+py==1.10.0
 pycodestyle==2.4.0
 pycparser==2.19
 pydocstyle==4.0.0
